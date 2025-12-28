@@ -2,10 +2,19 @@
 import { GoogleGenAI } from "@google/genai";
 
 export async function getStyleAdvice(userPrompt: string, imageData?: string) {
-  // Inicialização dentro da função garante que o app carregue mesmo se a API KEY demorar a injetar
-  const apiKey = process.env.API_KEY || "";
+  // Verificação segura da API KEY para evitar crash do script
+  let apiKey = '';
+  try {
+    apiKey = process?.env?.API_KEY || "";
+  } catch (e) {
+    console.warn("Ambiente de chaves de API não configurado.");
+  }
+
+  if (!apiKey) {
+    return "O serviço de IA requer uma chave de API configurada. Por favor, verifique as configurações do servidor.";
+  }
+
   const ai = new GoogleGenAI({ apiKey });
-  
   const model = "gemini-3-flash-preview";
   
   const systemInstruction = `
@@ -20,10 +29,10 @@ export async function getStyleAdvice(userPrompt: string, imageData?: string) {
     Seja amigável e use emojis masculinos/estilo de barbearia ocasionalmente (✂️, 💈, 🧔).
   `;
 
-  const contents: any[] = [{ text: userPrompt }];
+  const parts: any[] = [{ text: userPrompt }];
   
   if (imageData) {
-    contents.push({
+    parts.push({
       inlineData: {
         mimeType: "image/jpeg",
         data: imageData
@@ -34,15 +43,15 @@ export async function getStyleAdvice(userPrompt: string, imageData?: string) {
   try {
     const response = await ai.models.generateContent({
       model,
-      contents: { parts: contents },
+      contents: { parts },
       config: {
         systemInstruction,
         temperature: 0.7,
       }
     });
-    return response.text || "Não consegui gerar uma resposta. Tente descrever seu estilo de outra forma.";
+    return response.text || "Não consegui gerar uma resposta no momento.";
   } catch (error) {
-    console.error("Gemini Error:", error);
-    return "Desculpe, meu sistema de consultoria está em manutenção no momento. Tente novamente em alguns minutos!";
+    console.error("Gemini API Error:", error);
+    return "Desculpe, meu sistema de consultoria está temporariamente indisponível. Tente descrever seu estilo para nossos barbeiros pessoalmente!";
   }
 }
