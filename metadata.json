@@ -1,0 +1,7 @@
+{
+  "name": "Copy of Copy of Barba & Estilo - Barber Booking & AI Stylist",
+  "description": "Uma plataforma premium de agendamento para barbearias com consultoria de estilo inteligente movida por IA para ajudar você a escolher o melhor corte.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
