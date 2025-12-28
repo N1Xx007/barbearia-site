@@ -1,9 +1,11 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export async function getStyleAdvice(userPrompt: string, imageData?: string) {
+  // Inicialização dentro da função garante que o app carregue mesmo se a API KEY demorar a injetar
+  const apiKey = process.env.API_KEY || "";
+  const ai = new GoogleGenAI({ apiKey });
+  
   const model = "gemini-3-flash-preview";
   
   const systemInstruction = `
@@ -38,7 +40,7 @@ export async function getStyleAdvice(userPrompt: string, imageData?: string) {
         temperature: 0.7,
       }
     });
-    return response.text;
+    return response.text || "Não consegui gerar uma resposta. Tente descrever seu estilo de outra forma.";
   } catch (error) {
     console.error("Gemini Error:", error);
     return "Desculpe, meu sistema de consultoria está em manutenção no momento. Tente novamente em alguns minutos!";

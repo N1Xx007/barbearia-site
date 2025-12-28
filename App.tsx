@@ -10,10 +10,14 @@ import { SERVICES } from './constants';
 import { dbService } from './services/dbService';
 
 const App: React.FC = () => {
-  // Inicializa estados lendo diretamente do localStorage
+  // Inicializa estados com tratamento de erro para evitar "tela preta" se LocalStorage falhar
   const [view, setView] = useState<ViewState>(() => {
-    const savedView = localStorage.getItem('barba_estilo_current_view');
-    return (savedView as ViewState) || 'HOME';
+    try {
+      const savedView = localStorage.getItem('barba_estilo_current_view');
+      return (savedView as ViewState) || 'HOME';
+    } catch (e) {
+      return 'HOME';
+    }
   });
 
   const [appointments, setAppointments] = useState<Appointment[]>(() => {
@@ -23,12 +27,20 @@ const App: React.FC = () => {
   const [notification, setNotification] = useState<string | null>(null);
   const [adminPassword, setAdminPassword] = useState('');
   const [isAdmin, setIsAdmin] = useState(() => {
-    return localStorage.getItem('barba_estilo_admin') === 'true';
+    try {
+      return localStorage.getItem('barba_estilo_admin') === 'true';
+    } catch (e) {
+      return false;
+    }
   });
 
-  // Salva a view atual sempre que mudar
+  // Persistência da view atual
   useEffect(() => {
-    localStorage.setItem('barba_estilo_current_view', view);
+    try {
+      localStorage.setItem('barba_estilo_current_view', view);
+    } catch (e) {
+      console.warn("Não foi possível salvar a visualização atual no LocalStorage.");
+    }
   }, [view]);
 
   const refreshData = useCallback(() => {
@@ -59,7 +71,9 @@ const App: React.FC = () => {
     e.preventDefault();
     if (adminPassword === 'admin123') {
       setIsAdmin(true);
-      localStorage.setItem('barba_estilo_admin', 'true');
+      try {
+        localStorage.setItem('barba_estilo_admin', 'true');
+      } catch (err) {}
       setView('ADMIN_DASHBOARD');
       setAdminPassword('');
     } else {
@@ -69,7 +83,9 @@ const App: React.FC = () => {
 
   const handleAdminLogout = () => {
     setIsAdmin(false);
-    localStorage.removeItem('barba_estilo_admin');
+    try {
+      localStorage.removeItem('barba_estilo_admin');
+    } catch (err) {}
     setView('HOME');
   };
 
@@ -103,15 +119,20 @@ const App: React.FC = () => {
       );
     }
 
-    if (view === 'ADMIN_DASHBOARD' && isAdmin) {
-      return (
-        <AdminDashboard 
-          appointments={appointments} 
-          onUpdateStatus={updateStatus} 
-          onDelete={deleteAppointment} 
-          onLogout={handleAdminLogout} 
-        />
-      );
+    if (view === 'ADMIN_DASHBOARD') {
+      if (isAdmin) {
+        return (
+          <AdminDashboard 
+            appointments={appointments} 
+            onUpdateStatus={updateStatus} 
+            onDelete={deleteAppointment} 
+            onLogout={handleAdminLogout} 
+          />
+        );
+      } else {
+        setView('ADMIN_LOGIN');
+        return null;
+      }
     }
 
     switch (view) {
@@ -160,7 +181,6 @@ const App: React.FC = () => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {appointments.slice().reverse().map(app => {
-                  // Converte string de data ISO/YYYY-MM-DD com segurança para exibição
                   const dateParts = app.date.split('-');
                   const displayDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : app.date;
 
@@ -198,7 +218,8 @@ const App: React.FC = () => {
           </section>
         );
       default:
-        return null;
+        // Fallback para evitar tela branca caso a view seja inválida
+        return <Hero onStartBooking={() => setView('BOOKING')} onAIStyle={() => setView('AI_STYLING')} />;
     }
   };
 
