@@ -3,58 +3,48 @@ import React, { useState, useEffect } from 'react';
 
 const InstallPWA: React.FC = () => {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [showIosTip, setShowIosTip] = useState(false);
 
   useEffect(() => {
     const handler = (e: Event) => {
+      // Previne o mini-infobar padrão do navegador no Android
       e.preventDefault();
+      // Guarda o evento para ser disparado pelo nosso botão
       setDeferredPrompt(e);
-      console.log('Evento beforeinstallprompt capturado');
     };
 
     window.addEventListener('beforeinstallprompt', handler);
 
     window.addEventListener('appinstalled', () => {
+      // Limpa o prompt após a instalação bem-sucedida
       setDeferredPrompt(null);
-      console.log('App instalado com sucesso');
     });
 
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const handleInstallClick = async () => {
-    if (deferredPrompt) {
-      // Android / Chrome
-      deferredPrompt.prompt();
-      const { outcome } = await deferredPrompt.userChoice;
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null);
-      }
+    if (!deferredPrompt) {
+      console.log('O prompt de instalação ainda não está pronto ou não é suportado neste navegador.');
+      return;
+    }
+
+    // Mostra o prompt de instalação nativo
+    deferredPrompt.prompt();
+
+    // Aguarda a escolha do usuário
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      console.log('Usuário aceitou a instalação');
+      setDeferredPrompt(null);
     } else {
-      // iOS ou Navegadores sem suporte a prompt automático
-      setShowIosTip(true);
-      setTimeout(() => setShowIosTip(false), 5000);
+      console.log('Usuário recusou a instalação');
     }
   };
 
-  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-
+  // Se o prompt não estiver disponível (ex: iOS ou já instalado), 
+  // poderíamos esconder o botão, mas manteremos visível conforme solicitado.
   return (
     <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-center gap-1">
-      {/* Balão de Dica (Aparece apenas se a instalação automática falhar) */}
-      {showIosTip && (
-        <div className="absolute bottom-20 right-0 bg-slate-900 border border-gold/40 p-4 rounded-2xl shadow-2xl w-64 animate-fadeIn text-sm">
-          <p className="text-white">
-            {isIOS ? (
-              <>Toque em <i className="fa-solid fa-arrow-up-from-bracket text-gold mx-1"></i> <strong>Compartilhar</strong> e selecione <strong>"Adicionar à Tela de Início"</strong>.</>
-            ) : (
-              "Abra o menu do seu navegador e selecione 'Instalar App' ou 'Adicionar à tela inicial'."
-            )}
-          </p>
-          <div className="absolute bottom-[-6px] right-6 w-3 h-3 bg-slate-900 border-r border-b border-gold/40 rotate-45"></div>
-        </div>
-      )}
-
       <button
         onClick={handleInstallClick}
         className="w-14 h-14 bg-gold text-slate-950 rounded-full shadow-2xl flex items-center justify-center text-xl hover:scale-110 active:scale-95 transition-all animate-pulse shadow-gold/20 group relative"
