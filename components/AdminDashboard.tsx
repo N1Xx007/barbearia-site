@@ -160,8 +160,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ appointments, onUpdateS
                     <td className="p-4 font-bold text-gold">R$ {app.totalPrice}</td>
                     <td className="p-4">
                       <div className="flex justify-center gap-2">
-                        {app.status === 'PENDING' && <button onClick={() => onUpdateStatus(app.id, 'COMPLETED')} className="w-8 h-8 rounded-full bg-green-500 text-slate-950 flex items-center justify-center"><i className="fa-solid fa-check"></i></button>}
-                        <button onClick={() => onDelete(app.id)} className="w-8 h-8 rounded-full bg-slate-800 text-red-400 flex items-center justify-center"><i className="fa-solid fa-trash"></i></button>
+                        {app.status === 'PENDING' && (
+                          <button 
+                            type="button"
+                            onClick={() => onUpdateStatus(app.id, 'COMPLETED')} 
+                            className="w-8 h-8 rounded-full bg-green-500 text-slate-950 flex items-center justify-center hover:scale-110 transition-transform"
+                          >
+                            <i className="fa-solid fa-check"></i>
+                          </button>
+                        )}
+                        <button 
+                          type="button"
+                          onClick={() => onDelete(app.id)} 
+                          className="w-8 h-8 rounded-full bg-slate-800 text-red-400 flex items-center justify-center hover:bg-red-500/20 transition-all"
+                        >
+                          <i className="fa-solid fa-trash"></i>
+                        </button>
                       </div>
                     </td>
                   </tr>

@@ -5,6 +5,7 @@ import Hero from './components/Hero';
 import BookingFlow from './components/BookingFlow';
 import AIConsultant from './components/AIConsultant';
 import AdminDashboard from './components/AdminDashboard';
+import InstallPWA from './components/InstallPWA';
 import { ViewState, Appointment, Service } from './types';
 import { dbService } from './services/dbService';
 
@@ -199,6 +200,9 @@ const App: React.FC = () => {
         </div>
       )}
       {renderContent()}
+      
+      {/* Botão de Instalação Flutuante */}
+      {!isAdmin && <InstallPWA />}
       
       {/* Footer Permanente para Acesso Administrativo */}
       {view !== 'ADMIN_DASHBOARD' && view !== 'ADMIN_LOGIN' && (
