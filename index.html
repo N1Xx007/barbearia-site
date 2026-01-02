@@ -4,21 +4,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barba & Estilo - Barber Booking</title>
+    <title>Barba & Estilo | Barbearia Premium</title>
     
-    <!-- PWA Meta Tags -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#c5a059">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Barba & Estilo">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2821/2821012.png">
-
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- SHIM CRÍTICO: Define 'process' antes de qualquer módulo carregar -->
     <script>
         window.process = window.process || { env: { API_KEY: "" } };
     </script>
@@ -26,44 +17,31 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: #0a0a0a;
+            color: #f3f4f6;
             margin: 0;
-            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
         }
         h1, h2, h3, .font-serif {
             font-family: 'Playfair+Display', serif;
         }
-        .bg-gold { background-color: #c5a059; }
         .text-gold { color: #c5a059; }
+        .bg-gold { background-color: #c5a059; }
         .border-gold { border-color: #c5a059; }
         
-        #root:empty {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100vw;
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
         }
-        #root:empty::after {
-            content: "";
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(197, 160, 89, 0.1);
-            border-top-color: #c5a059;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #111;
         }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c5a059;
+            border-radius: 10px;
         }
 
-        .animate-fadeIn {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .hero-gradient {
+            background: linear-gradient(to bottom, rgba(10,10,10,0.4) 0%, rgba(10,10,10,1) 100%);
         }
     </style>
 <script type="importmap">

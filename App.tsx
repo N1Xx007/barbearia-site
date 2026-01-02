@@ -5,7 +5,6 @@ import Hero from './components/Hero';
 import BookingFlow from './components/BookingFlow';
 import AIConsultant from './components/AIConsultant';
 import AdminDashboard from './components/AdminDashboard';
-import InstallPWA from './components/InstallPWA';
 import { ViewState, Appointment, Service } from './types';
 import { dbService } from './services/dbService';
 
@@ -57,7 +56,7 @@ const App: React.FC = () => {
   };
 
   const deleteAppointment = (id: string) => {
-    if (window.confirm('Excluir este agendamento permanentemente?')) {
+    if (window.confirm('Excluir este agendamento?')) {
       dbService.deleteAppointment(id);
       refreshData();
     }
@@ -66,67 +65,49 @@ const App: React.FC = () => {
   const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoggingIn(true);
-    await new Promise(resolve => setTimeout(resolve, 600));
-
     if (dbService.setAdminSession(adminPassword)) {
       setIsAdmin(true);
       setView('ADMIN_DASHBOARD');
       setAdminPassword('');
     } else {
-      alert('Chave de acesso inválida!');
+      alert('Chave inválida!');
     }
     setIsLoggingIn(false);
-  };
-
-  const handleAdminLogout = () => {
-    dbService.clearAdminSession();
-    setIsAdmin(false);
-    setView('HOME');
   };
 
   const renderContent = () => {
     if (view === 'ADMIN_LOGIN') {
       return (
-        <div className="min-h-[70vh] flex items-center justify-center px-4 animate-fadeIn">
-          <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 w-full max-w-md shadow-2xl">
-            <h2 className="text-3xl font-bold text-center mb-6">Área do <span className="text-gold">Barbeiro</span></h2>
+        <div className="min-h-[70vh] flex items-center justify-center px-4">
+          <div className="bg-zinc-900 p-8 rounded-3xl border border-zinc-800 w-full max-w-md">
+            <h2 className="text-3xl font-bold text-center mb-6">Portal <span className="text-gold italic font-serif">Profissional</span></h2>
             <form onSubmit={handleAdminLogin} className="space-y-6">
-              <div>
-                <label className="block text-slate-500 mb-2 text-xs font-bold uppercase">Chave de Acesso</label>
-                <input 
-                  type="password"
-                  value={adminPassword}
-                  onChange={(e) => setAdminPassword(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-4 text-white focus:outline-none focus:border-gold"
-                  placeholder="••••••••"
-                  autoFocus
-                />
-              </div>
-              <button 
-                type="submit"
-                disabled={isLoggingIn}
-                className="w-full py-4 bg-gold text-slate-950 rounded-xl font-bold hover:bg-amber-500 transition-all flex items-center justify-center gap-2"
-              >
-                {isLoggingIn ? <i className="fa-solid fa-circle-notch animate-spin"></i> : 'Entrar no Sistema'}
+              <input 
+                type="password"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-4 text-white focus:border-gold outline-none"
+                placeholder="Senha administrativa"
+              />
+              <button className="w-full py-4 bg-gold text-black font-bold rounded-xl hover:opacity-90 transition-all">
+                Entrar
               </button>
-              <button type="button" onClick={() => setView('HOME')} className="w-full text-slate-500 text-xs font-bold uppercase hover:text-white transition-colors">Voltar</button>
+              <button type="button" onClick={() => setView('HOME')} className="w-full text-zinc-500 text-xs font-bold uppercase">Voltar</button>
             </form>
           </div>
         </div>
       );
     }
 
-    if (view === 'ADMIN_DASHBOARD') {
-      return isAdmin ? (
+    if (view === 'ADMIN_DASHBOARD' && isAdmin) {
+      return (
         <AdminDashboard 
           appointments={appointments} 
           onUpdateStatus={updateStatus} 
           onDelete={deleteAppointment} 
-          onLogout={handleAdminLogout}
+          onLogout={() => { dbService.clearAdminSession(); setIsAdmin(false); setView('HOME'); }}
           onDataChange={refreshData}
         />
-      ) : (
-        <div className="text-center py-20"><button onClick={() => setView('ADMIN_LOGIN')} className="text-gold font-bold underline">Fazer Login como Admin</button></div>
       );
     }
 
@@ -135,20 +116,22 @@ const App: React.FC = () => {
         return (
           <>
             <Hero onStartBooking={() => setView('BOOKING')} onAIStyle={() => setView('AI_STYLING')} />
-            <section className="py-20 bg-slate-950 px-4">
-              <div className="max-w-7xl mx-auto text-center mb-16">
-                <h2 className="text-gold uppercase tracking-widest text-sm font-bold mb-4">Nossos Serviços</h2>
-                <h3 className="text-4xl md:text-5xl font-bold">Menu de <span className="italic font-serif">Excelência</span></h3>
+            <section className="py-24 bg-black px-4">
+              <div className="max-w-7xl mx-auto text-center mb-20">
+                <h2 className="text-gold uppercase tracking-[0.2em] text-xs font-bold mb-4">Serviços Signature</h2>
+                <h3 className="text-4xl md:text-6xl font-bold">A Arte da <span className="italic font-serif">Barbearia</span></h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                 {services.map(service => (
-                  <div key={service.id} className="bg-slate-900 p-8 rounded-3xl border border-slate-800 hover:border-gold/30 transition-all">
-                    <i className={`fa-solid ${service.icon || 'fa-scissors'} text-3xl text-gold mb-6`}></i>
+                  <div key={service.id} className="bg-zinc-900 p-8 rounded-2xl border border-zinc-800 hover:border-gold/40 transition-all group">
+                    <div className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center mb-6 group-hover:bg-gold transition-colors">
+                      <i className={`fa-solid ${service.icon || 'fa-scissors'} text-gold group-hover:text-black`}></i>
+                    </div>
                     <h4 className="text-xl font-bold mb-2">{service.name}</h4>
-                    <p className="text-slate-400 text-sm mb-6 h-10 overflow-hidden">{service.description}</p>
-                    <div className="flex justify-between items-center pt-4 border-t border-slate-800">
+                    <p className="text-zinc-500 text-sm mb-6 leading-relaxed">{service.description}</p>
+                    <div className="flex justify-between items-center pt-6 border-t border-zinc-800">
                       <span className="text-gold font-bold text-xl">R$ {service.price}</span>
-                      <span className="text-slate-600 text-[10px] uppercase font-bold">{service.duration} min</span>
+                      <span className="text-zinc-600 text-[10px] uppercase font-bold tracking-widest">{service.duration} min</span>
                     </div>
                   </div>
                 ))}
@@ -162,23 +145,26 @@ const App: React.FC = () => {
         return <AIConsultant />;
       case 'MY_APPOINTMENTS':
         return (
-          <section className="py-12 px-4 max-w-5xl mx-auto animate-fadeIn">
-            <h2 className="text-4xl font-bold text-center mb-12">Meus <span className="text-gold">Agendamentos</span></h2>
+          <section className="py-16 px-4 max-w-5xl mx-auto">
+            <h2 className="text-4xl font-bold text-center mb-16">Seus <span className="text-gold italic font-serif">Agendamentos</span></h2>
             {appointments.length === 0 ? (
-              <div className="text-center bg-slate-900 p-12 rounded-3xl border border-slate-800">
-                <p className="text-slate-400">Você ainda não tem agendamentos salvos.</p>
-                <button onClick={() => setView('BOOKING')} className="mt-6 px-8 py-3 bg-gold text-slate-950 rounded-xl font-bold">Agendar Agora</button>
+              <div className="text-center py-20 bg-zinc-900 rounded-3xl border border-zinc-800">
+                <p className="text-zinc-500 mb-8">Nenhuma reserva encontrada no seu dispositivo.</p>
+                <button onClick={() => setView('BOOKING')} className="px-10 py-4 bg-gold text-black font-bold rounded-xl">Começar Agora</button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid gap-4">
                 {appointments.slice().reverse().map(app => (
-                  <div key={app.id} className="bg-slate-900 border border-slate-800 rounded-3xl p-6 relative">
-                    <div className={`absolute top-0 left-0 w-2 h-full ${app.status === 'COMPLETED' ? 'bg-green-500' : app.status === 'CANCELLED' ? 'bg-red-500' : 'bg-gold'}`}></div>
-                    <h4 className="text-lg font-bold text-gold uppercase truncate mb-2">{app.services.map(s => s.name).join(' + ')}</h4>
-                    <p className="text-slate-400 text-sm">{app.date} às {app.time}</p>
-                    <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-800">
-                      <span className="text-xs text-slate-600">ID: {app.id}</span>
-                      <span className="font-bold text-white">R$ {app.totalPrice}</span>
+                  <div key={app.id} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div className="text-center md:text-left">
+                      <h4 className="text-xl font-bold text-gold uppercase">{app.services[0]?.name}</h4>
+                      <p className="text-zinc-400">{app.date} às {app.time} • com {app.barber.name}</p>
+                    </div>
+                    <div className="flex items-center gap-6">
+                      <span className={`px-4 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest ${app.status === 'COMPLETED' ? 'bg-green-500/10 text-green-500' : 'bg-gold/10 text-gold'}`}>
+                        {app.status}
+                      </span>
+                      <span className="text-xl font-bold">R$ {app.totalPrice}</span>
                     </div>
                   </div>
                 ))}
@@ -187,48 +173,31 @@ const App: React.FC = () => {
           </section>
         );
       default:
-        return <Hero onStartBooking={() => setView('BOOKING')} onAIStyle={() => setView('AI_STYLING')} />;
+        return null;
     }
   };
 
   return (
-    <Layout currentView={view} onNavigate={(v) => setView(v)}>
+    <Layout currentView={view} onNavigate={setView}>
       {notification && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] bg-green-500 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-3 animate-bounce">
-          <i className="fa-solid fa-circle-check text-xl"></i>
-          <span className="font-bold">{notification}</span>
+        <div className="fixed top-8 left-1/2 -translate-x-1/2 z-[100] bg-zinc-900 border border-gold text-gold px-8 py-4 rounded-2xl shadow-2xl font-bold animate-fadeIn">
+          {notification}
         </div>
       )}
       {renderContent()}
       
-      {/* Botão de Instalação Flutuante */}
-      {!isAdmin && <InstallPWA />}
-      
-      {/* Footer Permanente para Acesso Administrativo */}
-      {view !== 'ADMIN_DASHBOARD' && view !== 'ADMIN_LOGIN' && (
-        <footer className="bg-slate-950 py-12 border-t border-slate-900 mt-20">
-          <div className="max-w-7xl mx-auto px-4 text-center">
-            <div className="mb-8">
-              <h4 className="text-gold font-serif text-2xl mb-2">Barba & Estilo</h4>
-              <p className="text-slate-500 text-sm">Onde a tradição encontra o futuro.</p>
-            </div>
-            <div className="pt-8 border-t border-slate-900 inline-block">
-              <button 
-                onClick={() => setView('ADMIN_LOGIN')}
-                className="group flex items-center gap-3 text-slate-600 hover:text-gold transition-all"
-              >
-                <div className="w-10 h-10 rounded-full border border-slate-800 flex items-center justify-center group-hover:border-gold/50">
-                  <i className="fa-solid fa-user-tie"></i>
-                </div>
-                <div className="text-left">
-                  <p className="text-[10px] uppercase font-bold tracking-widest opacity-50">Área Profissional</p>
-                  <p className="text-sm font-bold">Acessar Painel de Controle</p>
-                </div>
-              </button>
-            </div>
-          </div>
-        </footer>
-      )}
+      <footer className="bg-black py-20 border-t border-zinc-900 mt-20">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col items-center">
+          <h2 className="text-gold font-serif text-3xl mb-4 italic">Barba & Estilo</h2>
+          <p className="text-zinc-600 text-sm mb-12">Desde 2018 moldando o visual do homem moderno.</p>
+          <button 
+            onClick={() => setView('ADMIN_LOGIN')}
+            className="text-zinc-700 hover:text-gold text-xs font-bold uppercase tracking-[0.3em] transition-colors"
+          >
+            Acesso Restrito
+          </button>
+        </div>
+      </footer>
     </Layout>
   );
 };
