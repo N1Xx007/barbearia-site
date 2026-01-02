@@ -5,6 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Barba & Estilo - Barber Booking</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#c5a059">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Barba & Estilo">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2821/2821012.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -20,6 +29,7 @@
             background-color: #0f172a;
             color: #f8fafc;
             margin: 0;
+            -webkit-tap-highlight-color: transparent;
         }
         h1, h2, h3, .font-serif {
             font-family: 'Playfair+Display', serif;
@@ -28,7 +38,6 @@
         .text-gold { color: #c5a059; }
         .border-gold { border-color: #c5a059; }
         
-        /* Previne o flash de tela preta antes do React carregar */
         #root:empty {
             display: flex;
             align-items: center;
@@ -47,6 +56,14 @@
         }
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 <script type="importmap">
